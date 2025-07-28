@@ -1,14 +1,15 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+// Définir les routes protégées
 const isProtectedRoute = createRouteMatcher(["/"]);
 
-export default clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware((auth, req) => {
+  // Si la route actuelle fait partie des routes protégées
   if (isProtectedRoute(req)) {
-    const session = await auth();   // ✅ on attend la promesse
-    session.redirectToSignIn();     // ✅ puis on appelle la méthode
+   auth.protect();// protège la route
   }
 });
 
 export const config = {
-  matcher: ["/((?!.+.[w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

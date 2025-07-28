@@ -1,36 +1,36 @@
 "use server";
-import { eq, not } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db/drizzle";
-
 import { users } from "@/db/schema";
 
 export const getAllUsers = async () => {
-  const user = await db.select().from(users);
-  return user;
+  const data = await db.select().from(users);
+  return data;
 };
 
-export const getUser = async (userId:number) => {
- 
+export const getUser = async (userId: any) => {
   const user = await db.query.users.findMany({
-   where:(users ,{ eq }) => eq(users.id, userId),
+    where: (users, { eq }) => eq(users.clerkId, userId),
     with: {
       todos: true,
-
     },
   });
+
   return user;
-  
 };
 
-export const addUser = async () => {
-  await db.insert(users).values({
-    name: "user1",
-    email: "unair@gmail.com",
-  
-  });
-
-  revalidatePath("/");
+export const addUser = async (user: any) => {
+  await db
+    .insert(users)
+    .values({
+      clerkId: user?.clerkId,
+      email: user?.email,
+      name: user?.name!,
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      photo: user?.photo,
+    })
+    .returning({ clerkClientId: users?.clerkId });
 };
-
